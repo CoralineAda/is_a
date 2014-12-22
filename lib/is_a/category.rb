@@ -8,10 +8,14 @@ module IsA
 
     field :name
 
-    def is_a?(category)
-      return true if parent == category
-      return false if parent.nil?
-      is_a?(category.parent)
+    def is_a?(thing=self, classification)
+      return true if thing.parent == classification
+      return false if thing.parent.nil?
+      is_a?(thing.parent, classification)
+    end
+
+    def is_a!(category)
+      update_attribute(:category_id, category.id)
     end
 
     def parent

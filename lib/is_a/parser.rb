@@ -28,11 +28,11 @@ module IsA
       end
 
       def subject
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[2])
+        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[1])
       end
 
       def object
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[-1])
+        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[-1].gsub('?', ''))
       end
 
       def response
@@ -50,7 +50,7 @@ module IsA
       end
 
       def subject
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[1])
+        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[0])
       end
 
       def object

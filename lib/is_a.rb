@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler'
 require 'bundler/setup'
 require 'dotenv'
+require 'mongoid'
 require 'require_all'
 require 'pry'
 
