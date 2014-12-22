@@ -30,7 +30,7 @@ module IsA
     def characteristic_answer
       return "Yes." if subject.has?(characteristic)
       return "It sometimes does." if subject.any_child_has?(characteristic)
-#      return "It might." if subject.any_parent_has?(characteristic)
+      return "It might." if subject.any_parent_has?(characteristic)
       "Not as far as I know."
     end
 

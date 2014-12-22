@@ -8,6 +8,13 @@ module IsA
     has_and_belongs_to_many :characteristics
 
     field :name
+    field :stem
+
+    before_create, :stem_word
+
+    def stem_word
+      self.stem = Lingua.stemmer(self.base_form)
+    end
 
     def is_a?(thing=self, classification)
       return true if thing.parent == classification
