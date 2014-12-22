@@ -29,7 +29,7 @@ module IsA
 
     def characteristic_answer
       return "Yes." if subject.has?(characteristic)
-      return "It sometimes does." if subject.any_child_has?(characteristic)
+      return "#{subject.name.pluralize.capitalize} sometimes do." if subject.any_child_has?(characteristic)
       return "It might." if subject.any_parent_has?(characteristic)
       "Not as far as I know."
     end
@@ -68,23 +68,27 @@ module IsA
       PartsOfSpeech.probable_nouns_from(text)
     end
 
+    def singularized_nouns
+      nouns.map(&:singularize)
+    end
+
     def subject
-      Category.find_or_create_by(name: nouns.first)
+      Category.find_or_create_by(name: singularized_nouns.first)
     end
 
     def category
       if is_question?
-        Category.where(name: nouns.last).last || Category.new(name: nouns.last)
+        Category.where(name: singularized_nouns.last).last || Category.new(name: nouns.last)
       else
-        Category.find_or_create_by(name: nouns.last)
+        Category.find_or_create_by(name: singularized_nouns.last)
       end
     end
 
     def characteristic
       if is_question?
-        Characteristic.where(name: nouns.last).last || Characteristic.new(name: nouns.last)
+        Characteristic.where(name: singularized_nouns.last).last || Characteristic.new(name: nouns.last)
       else
-        Characteristic.find_or_create_by(name: nouns.last)
+        Characteristic.find_or_create_by(name: singularized_nouns.last)
       end
     end
 

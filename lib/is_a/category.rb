@@ -8,12 +8,11 @@ module IsA
     has_and_belongs_to_many :characteristics
 
     field :name
-    field :stem
 
-    before_create, :stem_word
+    before_create :singularize_word
 
-    def stem_word
-      self.stem = Lingua.stemmer(self.base_form)
+    def singularize_word
+      self.name = self.name.singularize
     end
 
     def is_a?(thing=self, classification)
@@ -31,6 +30,11 @@ module IsA
     def any_child_has?(classification=self, characteristic)
       return false unless self.categories.any?
       self.categories.detect{|c| c.has?(characteristic) || c.any_child_has?(c, characteristic)}
+    end
+
+    def any_parent_has?(classification=self, characteristic)
+      return false unless self.parent
+      self.parent.has?(characteristic)
     end
 
     def is_a!(category)

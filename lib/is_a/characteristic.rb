@@ -6,12 +6,11 @@ module IsA
     has_and_belongs_to_many :categories
 
     field :name
-    field :stem
 
-    before_create, :stem_word
+    before_create :singularize_word
 
-    def stem_word
-      self.stem = Lingua.stemmer(self.base_form)
+    def singularize_word
+      self.name = self.name.singularize
     end
 
   end
