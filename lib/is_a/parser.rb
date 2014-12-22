@@ -3,65 +3,89 @@ module IsA
 
     attr_reader :text
 
-    ARTICLES = ["a", "an", "the"]
-
     def initialize(text)
-      @text = text
-      @statement = Question.new(text) if is_question?
-      @statement ||= Definition.new(text)
+      @text = text.downcase
     end
 
     def response
-      @statement.response
+      reponse_text = set_characteristic if is_characteristic_definition?
+      reponse_text ||= characteristic_answer if is_characteristic_question?
+      reponse_text ||= set_category if is_category_definition?
+      reponse_text ||= category_answer if is_category_question?
+      reponse_text
+    end
+
+    private
+
+    def category_answer
+      return "I don't know what #{subject.name} means." unless subject.connected?
+      return "No, but they are both #{category.parent.plural_name}." if subject.is_sibling?(category)
+      return "Yes." if subject.is_a?(category)
+      return "#{subject.plural_name} can sometimes be #{category.plural_name}." if category.has_a?(subject)
+      return "I don't know anything about #{category.plural_name}." unless category.categories.any?
+      return "Some #{subject.plural_name} are #{category.plural_name}." if subject.has_a?(category)
+      "I don't think so."
+    end
+
+    def characteristic_answer
+      return "Yes." if subject.has?(characteristic)
+      return "It sometimes does." if subject.any_child_has?(characteristic)
+#      return "It might." if subject.any_parent_has?(characteristic)
+      "Not as far as I know."
+    end
+
+    def set_category
+      subject.is_a! category
+      "Got it."
+    end
+
+    def set_characteristic
+      subject.has! characteristic
+      "I'll remember that."
+    end
+
+    def is_characteristic_question?
+      text =~ /^does.+\?$/
+    end
+
+    def is_characteristic_definition?
+      text =~ /\bhas\b/
+    end
+
+    def is_category_question?
+      text =~ /^is.+\?$/
+    end
+
+    def is_category_definition?
+      ! is_category_question? && ! is_characteristic_definition? && ! is_characteristic_question?
     end
 
     def is_question?
-      text =~ /\?$/
+      is_category_question? || is_characteristic_question?
     end
 
-    class Question
-
-      attr_reader :text
-
-      def initialize(text)
-        @text = text
-      end
-
-      def subject
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[1])
-      end
-
-      def object
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[-1].gsub('?', ''))
-      end
-
-      def response
-        subject.is_a?(object) ? "Yes." : "I don't think so."
-      end
-
+    def nouns
+      PartsOfSpeech.probable_nouns_from(text)
     end
 
-    class Definition
+    def subject
+      Category.find_or_create_by(name: nouns.first)
+    end
 
-      attr_reader :text
-
-      def initialize(text)
-        @text = text
+    def category
+      if is_question?
+        Category.where(name: nouns.last).last || Category.new(name: nouns.last)
+      else
+        Category.find_or_create_by(name: nouns.last)
       end
+    end
 
-      def subject
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[0])
+    def characteristic
+      if is_question?
+        Characteristic.where(name: nouns.last).last || Characteristic.new(name: nouns.last)
+      else
+        Characteristic.find_or_create_by(name: nouns.last)
       end
-
-      def object
-        Category.find_or_create_by(name: (text.downcase.split - Parser::ARTICLES)[-1])
-      end
-
-      def response
-        subject.is_a! object
-        "Okay."
-      end
-
     end
 
   end

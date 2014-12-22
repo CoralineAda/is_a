@@ -13,5 +13,10 @@ Mongoid.load!("config/mongoid.yml")
 require_all "lib/is_a"
 
 module IsA
-  # Your code goes here...
+
+  def self.reset
+    IsA::Category.delete_all
+    IsA::Characteristic.delete_all
+  end
+
 end
