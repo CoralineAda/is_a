@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "mongoid", "~> 3.1.6"
+  spec.add_dependency "mongoid", ">= 4.0.0"
   spec.add_dependency "require_all"
   spec.add_dependency "dotenv"
   spec.add_dependency 'ruby-stemmer', '>=0.8.3'
