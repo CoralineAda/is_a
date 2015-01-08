@@ -10,7 +10,7 @@ Dotenv.load
 Bundler.require
 Mongoid.load!("config/mongoid.yml")
 
-require_all "lib/is_a"
+require_rel "is_a/"
 
 module IsA
 
